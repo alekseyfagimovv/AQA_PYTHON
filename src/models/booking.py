@@ -5,7 +5,7 @@ from typing import Annotated
 from sqlalchemy import DateTime, ForeignKey, String, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .base import Base
+from src.models.base import Base
 
 timestamp = Annotated[datetime, mapped_column(DateTime(timezone=True))]
 

@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.dependencies import get_async_session
+from src.core.dependencies import get_async_session
 from src.models.booking import RoomModel
 from src.schemas.booking import RoomCreate, RoomResponse
 
@@ -46,6 +46,3 @@ async def del_rooms(room_id: int, db: Annotated[AsyncSession, Depends(get_async_
             detail="Переговорная комната не найдена")
     await db.delete(room)
     await db.commit()
-
-        
-    

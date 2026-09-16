@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.dependencies import get_async_session
+from src.core.dependencies import get_async_session
 from src.models.booking import BookingModel, RoomModel
 from src.schemas.booking import BookingCreate, BookingResponse
 
