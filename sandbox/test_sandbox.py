@@ -65,3 +65,46 @@ def test_two_books_different_id(book_factory):
 def test_book_factory_check_title(book_factory):
     result = book_factory("First")
     assert result['title'] == "First"
+
+#я ебать даже задания не понимаю ебать времени мало в пизду перечитай все епта
+from fastapi import FastAPI, HTTPException
+import pytest
+from fastapi.testclient import TestClient
+
+app = FastAPI()
+
+ROOMS = {1: {"id": 1, "name": "A"}, 2: {"id": 2, "name": "B"}}
+
+@app.get("/rooms/{room_id}")
+async def get_rooms(room_id):
+    if room_id in ROOMS:
+        return ROOMS[room_id]
+    else:
+        raise HTTPException(status_code=404)
+
+@pytest.fixture(scope="module")
+def rooms_data():
+    return ROOMS
+
+@pytest.fixture(scope="module")
+def client():
+    return TestClient(app)
+
+@pytest.fixture(scope="function")
+def first_room():
+    return ROOMS[1]["id"]
+
+def test_get_existing_room(client, first_room, rooms_data):
+    response = client.get(f"/rooms/{first_room}")
+    assert response.status_code == 200  
+    assert response.json()["name"] == rooms_data[first_room]["name"]   
+
+
+@pytest.mark.parametrize("unknown_id, expected", [(-1, 404), (0, 404), (999, 404)])
+def test_get_unknown_room(client, unknown_id, expected):
+    response = client.get(f"/rooms/{unknown_id}")
+    assert response.status_code == expected
+
+
+
+
