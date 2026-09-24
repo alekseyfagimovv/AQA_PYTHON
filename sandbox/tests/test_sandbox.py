@@ -66,7 +66,7 @@ def test_book_factory_check_title(book_factory):
     result = book_factory("First")
     assert result['title'] == "First"
 
-#я ебать даже задания не понимаю ебать времени мало в пизду перечитай все епта
+# Проверка работы ручек эдпоинта с параметризацией 
 from fastapi import FastAPI, HTTPException
 import pytest
 from fastapi.testclient import TestClient
@@ -76,11 +76,10 @@ app = FastAPI()
 ROOMS = {1: {"id": 1, "name": "A"}, 2: {"id": 2, "name": "B"}}
 
 @app.get("/rooms/{room_id}")
-async def get_rooms(room_id):
+async def get_rooms(room_id: int):
     if room_id in ROOMS:
         return ROOMS[room_id]
-    else:
-        raise HTTPException(status_code=404)
+    raise HTTPException(status_code=404)
 
 @pytest.fixture(scope="module")
 def rooms_data():
@@ -94,7 +93,7 @@ def client():
 def first_room():
     return ROOMS[1]["id"]
 
-def test_get_existing_room(client, first_room, rooms_data):
+def test_get_existing_room(client, first_room: int, rooms_data: dict[int, dict]):
     response = client.get(f"/rooms/{first_room}")
     assert response.status_code == 200  
     assert response.json()["name"] == rooms_data[first_room]["name"]   
@@ -105,6 +104,53 @@ def test_get_unknown_room(client, unknown_id, expected):
     response = client.get(f"/rooms/{unknown_id}")
     assert response.status_code == expected
 
+# defaul assert + raise tests
+import pytest
 
 
+def add(a, b):
+    return a + b 
 
+def test_add_two_positive():
+    assert add(2, 3) == 5
+
+def test_add_with_zero():
+    assert add(0, 7) == 7
+
+def test_add_negative():
+    assert add(-2, -3) == -5
+
+def test_add_raises_on_string():
+    with pytest.raises(TypeError):
+        add("2", 3)
+
+# test marks n' ini file 'n raise + assert
+import pytest
+
+def multiply(a, b):
+    return a * b    
+
+def divide(a, b):
+    if b == 0:
+        raise ValueError("division by zero")
+    return a / b
+
+@pytest.mark.smoke
+def test_multiply():
+    assert multiply(2, 3) == 6
+    assert multiply(0, 5) == 0
+    assert multiply(-2, 3) == -6
+    assert multiply(-2, -3) == 6
+    assert multiply(0, 0) == 0
+
+@pytest.mark.smoke
+def test_divide():
+    assert divide(10, 2) == 5.0
+    assert divide(-10, 2) == -5.0
+    assert divide(0, 5) == 0.0
+    assert divide(7, 2) == 3.5
+
+@pytest.mark.smoke
+def test_divide_by_zero():
+    with pytest.raises(ValueError, match="division by zero"):
+        divide(5, 0)
