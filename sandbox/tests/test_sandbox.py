@@ -154,3 +154,37 @@ def test_divide():
 def test_divide_by_zero():
     with pytest.raises(ValueError, match="division by zero"):
         divide(5, 0)
+
+
+#
+import pytest
+
+@pytest.fixture(scope="function")
+def user_data():
+    yield {"email": "user@example.com", "password": "password123"}
+    print("teardown")
+
+def test_email_and_pass_not_empty(user_data):
+    assert user_data["email"] == "user@example.com"
+    assert user_data["password"] == "password123"
+
+def is_valid_pass_word(p: str) -> bool:
+    return len(p) >= 8
+
+@pytest.mark.parametrize("password, expected_bool", [("short", False), ("12345678", True), ("password123", True)])
+def test_is_valid_pass_word(password, expected_bool):
+    assert is_valid_pass_word(password) == expected_bool
+
+# 
+@pytest.fixture(scope='function')
+def resource_module():
+    print("\n[SETUP] открываю ресурс")
+    yield {"status": "open"}
+    print("\n[TEARDOWN] закрываю ресурс")
+
+def test_uses_resource_module(resource_module):
+    assert resource_module["status"] == "open"
+
+def test_fails_resource_module(resource_module):
+    resource_module["status"] = "closed"
+    assert resource_module["status"] == "closed"  # специально падает
