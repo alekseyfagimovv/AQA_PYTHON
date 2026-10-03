@@ -62,26 +62,58 @@
 
  
 
-from src.routers.fetch_user import fetch_user
+# from src.routers.fetch_user import fetch_user
 
 
-def test_fetch_user(mocker):
-    mock_get = mocker.patch(
-        "src.routers.fetch_user.requests.get",
-        return_value=mocker.Mock(json=lambda: {"id": 1, "name": "Alice"})
-    )
-    result = fetch_user(1)
-    assert result == {"id": 1, "name": "Alice"}
-    mock_get.assert_called_once_with("https://api.example.com/users/1")
+# def test_fetch_user(mocker):
+#     mock_get = mocker.patch(
+#         "src.routers.fetch_user.requests.get",
+#         return_value=mocker.Mock(json=lambda: {"id": 1, "name": "Alice"})
+#     )
+#     result = fetch_user(1)
+#     assert result == {"id": 1, "name": "Alice"}
+#     mock_get.assert_called_once_with("https://api.example.com/users/1")
 
-import pytest
-import requests
+# import pytest
+# import requests
 
-def test_fetch_user_connection_error(mocker):
-    mocker.patch(
-        "src.routers.fetch_user.requests.get",
-        side_effect=requests.exceptions.ConnectionError
-    )
+# def test_fetch_user_connection_error(mocker):
+#     mocker.patch(
+#         "src.routers.fetch_user.requests.get",
+#         side_effect=requests.exceptions.ConnectionError
+#     )
     
-    with pytest.raises(requests.exceptions.ConnectionError):
-        fetch_user(1)
+#     with pytest.raises(requests.exceptions.ConnectionError):
+#         fetch_user(1)
+
+# # *****************
+ 
+
+# from src.routers.fetch_user import get_user_name
+
+
+# def test_get_user_name(mocker):
+#     fake_resp = mocker.MagicMock()
+#     fake_resp.json.return_value = {"name": "Alice"}
+
+#     mock_get = mocker.patch(
+#         "src.routers.fetch_user.requests.get",  # Нужно импортировать от места фактического использования функции
+#         return_value=fake_resp
+#     )
+#     result = get_user_name(42) 
+#     assert result == "Alice"
+#     mock_get.assert_called_once_with("https://api.example.com/users/42")
+
+
+from unittest.mock import MagicMock
+
+
+fake_resp = MagicMock() 
+fake_resp.json.return_value = {"name": "Alice"}
+
+fake_requests_get = MagicMock(return_value=fake_resp)
+
+resp = fake_requests_get("http://x/1")
+print(resp)
+print(resp.json())
+print(fake_requests_get.call_args)
