@@ -105,15 +105,32 @@
 #     mock_get.assert_called_once_with("https://api.example.com/users/42")
 
 
+# from unittest.mock import MagicMock
+
+
+# fake_resp = MagicMock() 
+# fake_resp.json.return_value = {"name": "Alice"}
+
+# fake_requests_get = MagicMock(return_value=fake_resp)
+
+# resp = fake_requests_get("http://x/1")
+# print(resp)
+# print(resp.json())
+# print(fake_requests_get.call_args)
+
+
+# ************************
+
+from routers.fetch_user import get_user_city
 from unittest.mock import MagicMock
 
+def test_get_user_city(mocker):
+    fake_resp = MagicMock()
+    fake_resp.json.return_value = {"address": {"city": "Kazan"}}
+    fake_resp.raise_for_status = None
+    mock_get = mocker.patch("routers.fetch_user.httpx.get", return_value=fake_resp)
+    assert mock_get.json.return_value() == {"address": {"city": "Kazan"}}
+    assert mock_get.raise_for_status() == None
 
-fake_resp = MagicMock() 
-fake_resp.json.return_value = {"name": "Alice"}
+    mock_get.assert_called_once_with("https://api.example.com/users/42")
 
-fake_requests_get = MagicMock(return_value=fake_resp)
-
-resp = fake_requests_get("http://x/1")
-print(resp)
-print(resp.json())
-print(fake_requests_get.call_args)
