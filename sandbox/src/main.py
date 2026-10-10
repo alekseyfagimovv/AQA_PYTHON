@@ -1,11 +1,11 @@
-from fastapi import FastAPI
+# from fastapi import FastAPI
 
-from sandbox.routers.coffee_router import router as coffee_router
+# from sandbox.routers.coffee_router import router as coffee_router
 
-app = FastAPI(title="test api")
+# app = FastAPI(title="test api")
 
-@app.get("/")
-def read_root():
-    return {"status": "работает", "title": app.title}
+# @app.get("/")
+# def read_root():
+#     return {"status": "работает", "title": app.title}
 
-app.include_router(coffee_router)
+# app.include_router(coffee_router)
