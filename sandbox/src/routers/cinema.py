@@ -1,90 +1,112 @@
-from fastapi import FastAPI, HTTPException, status
-from pydantic import BaseModel
-from typing import Optional
+# from fastapi import FastAPI, HTTPException, status
+# from pydantic import BaseModel
+# from typing import Optional
 
-app = FastAPI(title="КиноЛавка Bug Tracker")
+# app = FastAPI(title="КиноЛавка Bug Tracker")
 
-# --- In-memory storage ---
-bugs: dict[int, dict] = {}
-_next_id = 1
+# # --- In-memory storage ---
+# bugs: dict[int, dict] = {}
+# _next_id = 1
 
-# --- Допустимые переходы жизненного цикла бага ---
-ALLOWED_TRANSITIONS: dict[str, set[str]] = {
-    "New":            {"Assigned"},
-    "Assigned":       {"In Progress", "Reopened"},
-    "In Progress":    {"Fixed", "Reopened"},
-    "Fixed":          {"Ready for QA", "Reopened"},
-    "Ready for QA":   {"Verified", "Reopened"},
-    "Verified":       {"Closed", "Reopened"},
-    "Closed":         {"Reopened"},
-    "Reopened":       {"Assigned", "In Progress"},
-}
+# # --- Допустимые переходы жизненного цикла бага ---
+# ALLOWED_TRANSITIONS: dict[str, set[str]] = {
+#     "New":            {"Assigned"},
+#     "Assigned":       {"In Progress", "Reopened"},
+#     "In Progress":    {"Fixed", "Reopened"},
+#     "Fixed":          {"Ready for QA", "Reopened"},
+#     "Ready for QA":   {"Verified", "Reopened"},
+#     "Verified":       {"Closed", "Reopened"},
+#     "Closed":         {"Reopened"},
+#     "Reopened":       {"Assigned", "In Progress"},
+# }
 
-ALL_STATUSES = set(ALLOWED_TRANSITIONS.keys())
-
-
-# --- Schemas ---
-class BugCreate(BaseModel):
-    title: str
-    severity: str           # Critical | Major | Minor | Trivial
-    priority: str           # High | Medium | Low
+# ALL_STATUSES = set(ALLOWED_TRANSITIONS.keys())
 
 
-class BugTransition(BaseModel):
-    to_status: str
+# # --- Schemas ---
+# class BugCreate(BaseModel):
+#     title: str
+#     severity: str           # Critical | Major | Minor | Trivial
+#     priority: str           # High | Medium | Low
 
 
-# --- Endpoints ---
-@app.post("/bugs", status_code=status.HTTP_201_CREATED)
-def create_bug(payload: BugCreate):
-    global _next_id
-    bug_id = _next_id
-    _next_id += 1
-    bugs[bug_id] = {
-        "id": bug_id,
-        "title": payload.title,
-        "severity": payload.severity,
-        "priority": payload.priority,
-        "status": "New",
-    }
-    return bugs[bug_id]
+# class BugTransition(BaseModel):
+#     to_status: str
 
 
-@app.get("/bugs/{bug_id}")
-def get_bug(bug_id: int):
-    if bug_id not in bugs:
-        raise HTTPException(status_code=404, detail="Bug not found")
-    return bugs[bug_id]
+# # --- Endpoints ---
+# @app.post("/bugs", status_code=status.HTTP_201_CREATED)
+# def create_bug(payload: BugCreate):
+#     global _next_id
+#     bug_id = _next_id
+#     _next_id += 1
+#     bugs[bug_id] = {
+#         "id": bug_id,
+#         "title": payload.title,
+#         "severity": payload.severity,
+#         "priority": payload.priority,
+#         "status": "New",
+#     }
+#     return bugs[bug_id]
 
 
-@app.post("/bugs/{bug_id}/transition")
-def transition_bug(bug_id: int, payload: BugTransition):
-    if bug_id not in bugs:
-        raise HTTPException(status_code=404, detail="Bug not found")
-
-    bug = bugs[bug_id]
-    current = bug["status"]
-    target = payload.to_status
-
-    if target not in ALL_STATUSES:
-        raise HTTPException(status_code=400, detail=f"Unknown status: {target}")
-
-    if target not in ALLOWED_TRANSITIONS[current]:
-        raise HTTPException(
-            status_code=409,
-            detail=f"Illegal transition: {current} -> {target}",
-        )
-
-    # Бизнес-правило: при Reopened priority автоматически становится High
-    if target == "Reopened":
-        bug["priority"] = "High"
-
-    bug["status"] = target
-    return bug
+# @app.get("/bugs/{bug_id}")
+# def get_bug(bug_id: int):
+#     if bug_id not in bugs:
+#         raise HTTPException(status_code=404, detail="Bug not found")
+#     return bugs[bug_id]
 
 
-@app.delete("/bugs/{bug_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_bug(bug_id: int):
-    if bug_id not in bugs:
-        raise HTTPException(status_code=404, detail="Bug not found")
-    del bugs[bug_id]
+# @app.post("/bugs/{bug_id}/transition")
+# def transition_bug(bug_id: int, payload: BugTransition):
+#     if bug_id not in bugs:
+#         raise HTTPException(status_code=404, detail="Bug not found")
+
+#     bug = bugs[bug_id]
+#     current = bug["status"]
+#     target = payload.to_status
+
+#     if target not in ALL_STATUSES:
+#         raise HTTPException(status_code=400, detail=f"Unknown status: {target}")
+
+#     if target not in ALLOWED_TRANSITIONS[current]:
+#         raise HTTPException(
+#             status_code=409,
+#             detail=f"Illegal transition: {current} -> {target}",
+#         )
+
+#     # Бизнес-правило: при Reopened priority автоматически становится High
+#     if target == "Reopened":
+#         bug["priority"] = "High"
+
+#     bug["status"] = target
+#     return bug
+
+
+# @app.delete("/bugs/{bug_id}", status_code=status.HTTP_204_NO_CONTENT)
+# def delete_bug(bug_id: int):
+#     if bug_id not in bugs:
+#         raise HTTPException(status_code=404, detail="Bug not found")
+#     del bugs[bug_id]
+
+
+
+class TaskRepo:
+    def __init__(self):
+        self._store = {}
+        self._next_id = 1
+
+    def add(self, title: str) -> int:
+        task_id = self._next_id
+        self._store[task_id] = {"id": task_id, "title": title, "done": False}
+        self._next_id += 1
+        return task_id
+
+    def get(self, task_id: int) -> dict | None:
+        return self._store.get(task_id)
+
+    def mark_done(self, task_id: int) -> bool:
+        if task_id in self._store:
+            self._store[task_id]["done"] = True
+            return True
+        return False

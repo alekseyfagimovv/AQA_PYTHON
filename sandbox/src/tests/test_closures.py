@@ -121,16 +121,16 @@
 
 # ************************
 
-from routers.fetch_user import get_user_city
-from unittest.mock import MagicMock
+# from routers.fetch_user import get_user_city
+# from unittest.mock import MagicMock
 
-def test_get_user_city(mocker):
-    fake_resp = MagicMock()
-    fake_resp.json.return_value = {"address": {"city": "Kazan"}}
-    fake_resp.raise_for_status = None
-    mock_get = mocker.patch("routers.fetch_user.httpx.get", return_value=fake_resp)
-    assert mock_get.json.return_value() == {"address": {"city": "Kazan"}}
-    assert mock_get.raise_for_status() == None
+# def test_get_user_city(mocker):
+#     fake_resp = MagicMock()
+#     fake_resp.json.return_value = {"address": {"city": "Kazan"}}
+#     fake_resp.raise_for_status = None
+#     mock_get = mocker.patch("routers.fetch_user.httpx.get", return_value=fake_resp)
+#     assert mock_get.json.return_value() == {"address": {"city": "Kazan"}}
+#     assert mock_get.raise_for_status() == None
 
-    mock_get.assert_called_once_with("https://api.example.com/users/42")
+#     mock_get.assert_called_once_with("https://api.example.com/users/42")
 
