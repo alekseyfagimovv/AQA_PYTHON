@@ -50,3 +50,13 @@ def module_marker():
     print("\n[SETUP] module_marker создан")
     yield "marker"
     print("\n[TEARDOWN] module_marker уничтожен")
+
+# ********************************
+from routers.cinema import TaskRepo
+
+
+@pytest.fixture(scope="function")
+def test_repo():
+    repo = TaskRepo()
+    yield repo
+    repo._store.clear()

@@ -53,13 +53,6 @@
 
  
 import pytest
-from routers.cinema import TaskRepo
-
-@pytest.fixture(scope="function")
-def test_repo():
-    repo = TaskRepo()
-    yield repo
-    repo._store.clear()
 
 @pytest.mark.parametrize("name", [
     pytest.param("Задача", id='task'),

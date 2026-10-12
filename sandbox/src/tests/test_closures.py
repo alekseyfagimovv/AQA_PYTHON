@@ -86,7 +86,7 @@
 #     with pytest.raises(requests.exceptions.ConnectionError):
 #         fetch_user(1)
 
-# # *****************
+# *****************
  
 
 # from src.routers.fetch_user import get_user_name
