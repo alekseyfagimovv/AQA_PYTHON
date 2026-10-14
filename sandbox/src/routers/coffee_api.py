@@ -91,22 +91,77 @@
 
 
 
-class TaskRepo:
-    def __init__(self):
-        self._store = {}
-        self._next_id = 1
+# class TaskRepo:
+#     def __init__(self):
+#         self._store = {}
+#         self._next_id = 1
 
-    def add(self, title: str) -> int:
-        task_id = self._next_id
-        self._store[task_id] = {"id": task_id, "title": title, "done": False}
-        self._next_id += 1
-        return task_id
+#     def add(self, title: str) -> int:
+#         task_id = self._next_id
+#         self._store[task_id] = {"id": task_id, "title": title, "done": False}
+#         self._next_id += 1
+#         return task_id
 
-    def get(self, task_id: int) -> dict | None:
-        return self._store.get(task_id)
+#     def get(self, task_id: int) -> dict | None:
+#         return self._store.get(task_id)
 
-    def mark_done(self, task_id: int) -> bool:
-        if task_id in self._store:
-            self._store[task_id]["done"] = True
-            return True
-        return False
+#     def mark_done(self, task_id: int) -> bool:
+#         if task_id in self._store:
+#             self._store[task_id]["done"] = True
+#             return True
+#         return False
+
+
+
+
+# coffee_api.py
+
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from itertools import count
+
+app = FastAPI(title="Coffee Shop Demo")
+
+# --- фейковая БД ---
+_orders: dict[int, dict] = {}
+_id_seq = count(start=1)
+
+# --- схемы ---
+class OrderRequest(BaseModel):
+    quantity: int
+
+class OrderResponse(BaseModel):
+    id: int
+    status: str
+    quantity: int
+    message: str
+
+# --- эндпоинты ---
+@app.post("/coffee/order", response_model=OrderResponse, status_code=201)
+async def create_order(order: OrderRequest):
+    if not (1 <= order.quantity <= 10):
+        raise HTTPException(status_code=400, detail="quantity must be between 1 and 10")
+
+    order_id = next(_id_seq)
+    record = {
+        "id": order_id,
+        "status": "created",
+        "quantity": order.quantity,
+        "message": f"Принято {order.quantity} чашек кофе",
+    }
+    _orders[order_id] = record
+    return record
+
+@app.get("/coffee/order/{order_id}", response_model=OrderResponse)
+async def get_order(order_id: int):
+    record = _orders.get(order_id)
+    if record is None:
+        raise HTTPException(status_code=404, detail="order not found")
+    return record
+
+@app.delete("/coffee/order/{order_id}", status_code=204)
+async def delete_order(order_id: int):
+    if order_id not in _orders:
+        raise HTTPException(status_code=404, detail="order not found")
+    del _orders[order_id]
+    return None
