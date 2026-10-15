@@ -61,42 +61,45 @@
 #     yield repo
 #     repo._store.clear()
 
-# confest.py
+# # confest.py
 
-import pytest
-from fastapi.testclient import TestClient
+# import pytest
+# from fastapi.testclient import TestClient
 
-from routers.coffee_api import app
-from routers.coffee_api import _orders
+# from routers.coffee_api import app
+# from routers.coffee_api import _orders
 
-@pytest.fixture(scope="function")
-def client():
-    return TestClient(app)
+# @pytest.fixture(scope="function")
+# def client():
+#     return TestClient(app)
 
-@pytest.fixture(scope="function")
-def create_order(client):
-    order_data = None
-    def make_post(quantity):
-        response = client.post("/coffee/order", json={"quantity": quantity}) 
-        nonlocal order_data
-        order_data = response
-        return response
-    yield make_post
-    if order_data is not None and order_data.status_code == 201:
-        _orders.pop(order_data.json()["id"], None)
+# @pytest.fixture(scope="function")
+# def create_order(client):
+#     order_data = None
+#     def make_post(quantity):
+#         response = client.post("/coffee/order", json={"quantity": quantity}) 
+#         nonlocal order_data
+#         order_data = response
+#         return response
+#     yield make_post
+#     if order_data is not None and order_data.status_code == 201:
+#         _orders.pop(order_data.json()["id"], None)
 
 
-@pytest.fixture(scope="function")
-def get_data(client):
-    def make_get(order_id):
-        response = client.get(f"/coffee/order/{order_id}") 
-        return response
-    yield make_get
+# @pytest.fixture(scope="function")
+# def get_data(client):
+#     def make_get(order_id):
+#         response = client.get(f"/coffee/order/{order_id}") 
+#         return response
+#     yield make_get
 
-@pytest.fixture(scope="function")
-def delete_data(client):
-    def make_delete(order_id):
-        response = client.delete(f"/coffee/order/{order_id}") 
-        return response
-    yield make_delete
+# @pytest.fixture(scope="function")
+# def delete_data(client):
+#     def make_delete(order_id):
+#         response = client.delete(f"/coffee/order/{order_id}") 
+#         return response
+#     yield make_delete
+
+
+
 

@@ -116,52 +116,59 @@
 
 # coffee_api.py
 
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from itertools import count
+# from fastapi import FastAPI, HTTPException
+# from pydantic import BaseModel
+# from itertools import count
 
-app = FastAPI(title="Coffee Shop Demo")
+# app = FastAPI(title="Coffee Shop Demo")
 
-# --- фейковая БД ---
-_orders: dict[int, dict] = {}
-_id_seq = count(start=1)
+# # --- фейковая БД ---
+# _orders: dict[int, dict] = {}
+# _id_seq = count(start=1)
 
-# --- схемы ---
-class OrderRequest(BaseModel):
-    quantity: int
+# # --- схемы ---
+# class OrderRequest(BaseModel):
+#     quantity: int
 
-class OrderResponse(BaseModel):
-    id: int
-    status: str
-    quantity: int
-    message: str
+# class OrderResponse(BaseModel):
+#     id: int
+#     status: str
+#     quantity: int
+#     message: str
 
-# --- эндпоинты ---
-@app.post("/coffee/order", response_model=OrderResponse, status_code=201)
-async def create_order(order: OrderRequest):
-    if not (1 <= order.quantity <= 10):
-        raise HTTPException(status_code=400, detail="quantity must be between 1 and 10")
+# # --- эндпоинты ---
+# @app.post("/coffee/order", response_model=OrderResponse, status_code=201)
+# async def create_order(order: OrderRequest):
+#     if not (1 <= order.quantity <= 10):
+#         raise HTTPException(status_code=400, detail="quantity must be between 1 and 10")
 
-    order_id = next(_id_seq)
-    record = {
-        "id": order_id,
-        "status": "created",
-        "quantity": order.quantity,
-        "message": f"Принято {order.quantity} чашек кофе",
-    }
-    _orders[order_id] = record
-    return record
+#     order_id = next(_id_seq)
+#     record = {
+#         "id": order_id,
+#         "status": "created",
+#         "quantity": order.quantity,
+#         "message": f"Принято {order.quantity} чашек кофе",
+#     }
+#     _orders[order_id] = record
+#     return record
 
-@app.get("/coffee/order/{order_id}", response_model=OrderResponse)
-async def get_order(order_id: int):
-    record = _orders.get(order_id)
-    if record is None:
-        raise HTTPException(status_code=404, detail="order not found")
-    return record
+# @app.get("/coffee/order/{order_id}", response_model=OrderResponse)
+# async def get_order(order_id: int):
+#     record = _orders.get(order_id)
+#     if record is None:
+#         raise HTTPException(status_code=404, detail="order not found")
+#     return record
 
-@app.delete("/coffee/order/{order_id}", status_code=204)
-async def delete_order(order_id: int):
-    if order_id not in _orders:
-        raise HTTPException(status_code=404, detail="order not found")
-    del _orders[order_id]
-    return None
+# @app.delete("/coffee/order/{order_id}", status_code=204)
+# async def delete_order(order_id: int):
+#     if order_id not in _orders:
+#         raise HTTPException(status_code=404, detail="order not found")
+#     del _orders[order_id]
+#     return None
+
+
+def calculate_total(price, discount):
+    if discount > price:
+        return 0
+    return price - discount
+

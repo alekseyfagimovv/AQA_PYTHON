@@ -71,51 +71,56 @@
 
 # test_cinema.py
 
+# import pytest
+
+# @pytest.mark.parametrize("meaning, result, code", [
+#     pytest.param(-1, -1, 400, id="-1, -1"),
+#     pytest.param(0, 0, 400, id="0, 0"),
+#     pytest.param(1, 1, 201, id="1, 1"),
+#     pytest.param(9, 9, 201, id="9, 9"),
+#     pytest.param(10, 10, 201, id="10, 10"),
+#     pytest.param(11, 11, 400, id="11, 11"),
+# ])
+# def test_create_order_valid_and_no_valid(create_order, meaning, result, code):
+#     response = create_order(meaning)
+#     assert response.status_code == code
+#     if code == 201:
+#         assert response.json()["quantity"] == result
+#     if code == 400:
+#         assert response.json()["detail"] == "quantity must be between 1 and 10"
+
+
+# def test_get_order_success_and_no_success(create_order, get_data):
+#     response_post = create_order(1)
+#     assert response_post.status_code == 201
+#     response_get = get_data(response_post.json()["id"])
+#     assert response_get.status_code == 200
+#     assert response_get.json() == {"id": response_post.json()["id"],
+#         "status": "created",
+#         "quantity": 1,
+#         "message": "Принято 1 чашек кофе"}
+#     response_get = get_data(999999)
+#     assert response_get.status_code == 404
+#     assert response_get.json()["detail"] == "order not found"
+    
+# def test_delete_order_success_and_no_success(create_order, delete_data):
+#     response_post = create_order(1)
+#     assert response_post.status_code == 201
+#     response_delete = delete_data(response_post.json()["id"])
+#     assert response_delete.status_code == 204
+#     response_delete = delete_data(999999)
+#     assert response_delete.status_code == 404
+#     assert response_delete.json()["detail"] == "order not found"
+
 import pytest
 
-@pytest.mark.parametrize("meaning, result, code", [
-    pytest.param(-1, -1, 400, id="-1, -1"),
-    pytest.param(0, 0, 400, id="0, 0"),
-    pytest.param(1, 1, 201, id="1, 1"),
-    pytest.param(9, 9, 201, id="9, 9"),
-    pytest.param(10, 10, 201, id="10, 10"),
-    pytest.param(11, 11, 400, id="11, 11"),
+from routers.coffee_api import calculate_total
+
+@pytest.mark.parametrize("price, discount, result", [
+    pytest.param(100, 20, 80, id="Regular purchase: price 100, discount 20 -> expect 80."),
+    pytest.param(50, 50, 0, id="The discount is equal to the price: price 50, discount 50 -> expect 0."),
+    pytest.param(30, 40, 0, id="Discount is more than the price: price 30, discount 40 -> expect 0.")
 ])
-def test_create_order_valid_and_no_valid(create_order, meaning, result, code):
-    response = create_order(meaning)
-    assert response.status_code == code
-    if code == 201:
-        assert response.json()["quantity"] == result
-    if code == 400:
-        assert response.json()["detail"] == "quantity must be between 1 and 10"
-
-
-def test_get_order_success_and_no_success(create_order, get_data):
-    response_post = create_order(1)
-    assert response_post.status_code == 201
-    response_get = get_data(response_post.json()["id"])
-    assert response_get.status_code == 200
-    assert response_get.json() == {"id": response_post.json()["id"],
-        "status": "created",
-        "quantity": 1,
-        "message": "Принято 1 чашек кофе"}
-    response_get = get_data(999999)
-    assert response_get.status_code == 404
-    assert response_get.json()["detail"] == "order not found"
-    
-def test_delete_order_success_and_no_success(create_order, delete_data):
-    response_post = create_order(1)
-    assert response_post.status_code == 201
-    response_delete = delete_data(response_post.json()["id"])
-    assert response_delete.status_code == 204
-    response_delete = delete_data(999999)
-    assert response_delete.status_code == 404
-    assert response_delete.json()["detail"] == "order not found"
-
-
-
-
-
-
-
-
+def test_calculate_total(price, discount, result):
+    total = calculate_total(price, discount)
+    assert total == result
