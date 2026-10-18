@@ -61,7 +61,7 @@
 #     yield repo
 #     repo._store.clear()
 
-# # confest.py
+# confest.py
 
 # import pytest
 # from fastapi.testclient import TestClient
@@ -102,4 +102,34 @@
 
 
 
+import pytest
+from fastapi.testclient import TestClient
 
+from routers.coffee_api import app
+from routers.coffee_api import fake_db
+
+@pytest.fixture(scope="function")
+def client():
+    return TestClient(app)
+
+
+@pytest.fixture(scope="function")
+def post_coffee(client):
+    order_data = []
+    def make_post(name, price):
+        response = client.post("/coffees/", json={"name": name, "price": price}) 
+        order_data.append(response)
+        return response
+    yield make_post
+    for response in order_data:
+        if response.status_code == 201:
+            coffee_id = response.json()["id"]
+            fake_db.pop(coffee_id, None) 
+
+
+@pytest.fixture(scope="function")
+def patch_coffee(client):
+    def make_patch(id, payload):
+        response = client.patch(f"/coffees/{id}", json=payload) 
+        return response
+    yield make_patch

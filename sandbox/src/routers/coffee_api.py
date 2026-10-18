@@ -167,8 +167,74 @@
 #     return None
 
 
-def calculate_total(price, discount):
-    if discount > price:
-        return 0
-    return price - discount
+# def calculate_total(price, discount):
+#     if discount > price:
+#         return 0
+#     return price - discount
 
+
+
+from fastapi import FastAPI, HTTPException, status
+from pydantic import BaseModel
+import itertools
+
+app = FastAPI()
+
+# "База данных" в оперативной памяти
+fake_db = {}
+id_counter = itertools.count(1)
+
+# Схема для создания
+class CoffeeCreate(BaseModel):
+    name: str
+    price: int
+
+# Схема для PATCH (все поля Optional, чтобы можно было передавать частично)
+class CoffeePatch(BaseModel):
+    name: str | None = None
+    price: int | None = None
+
+# Схема ответа
+class CoffeeResponse(BaseModel):
+    id: int
+    name: str
+    price: int
+
+# POST /coffees/ - для подготовки данных в тестах
+@app.post("/coffees/", response_model=CoffeeResponse, status_code=status.HTTP_201_CREATED)
+def create_coffee(coffee: CoffeeCreate):
+    new_id = next(id_counter)
+    fake_db[new_id] = {"id": new_id, "name": coffee.name, "price": coffee.price}
+    return fake_db[new_id]
+
+# GET /coffees/{id} - чтобы проверять состояние после PATCH
+@app.get("/coffees/{id}", response_model=CoffeeResponse)
+def get_coffee(id: int):
+    if id not in fake_db:
+        raise HTTPException(status_code=404, detail="Coffee not found")
+    return fake_db[id]
+
+# PATCH /coffees/{id} - твоя цель для тестирования
+@app.patch("/coffees/{id}", response_model=CoffeeResponse)
+def update_coffee(id: int, coffee: CoffeePatch):
+    if id not in fake_db:
+        raise HTTPException(status_code=404, detail="Coffee not found")
+    
+    stored_coffee = fake_db[id]
+    
+    # Обновляем только те поля, которые переданы (и не равны None)
+    # В FastAPI/Pydantic можно сделать так: coffee.model_dump(exclude_unset=True)
+    update_data = coffee.model_dump(exclude_unset=True)
+    
+    for key, value in update_data.items():
+        stored_coffee[key] = value
+        
+    return stored_coffee
+
+# DELETE /coffees/{id} - для teardown в фикстуре
+@app.delete("/coffees/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_coffee(id: int):
+    if id not in fake_db:
+        raise HTTPException(status_code=404, detail="Coffee not found")
+    del fake_db[id]
+    return None

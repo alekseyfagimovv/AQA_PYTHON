@@ -17,8 +17,8 @@
 #         assert "error" in response.json() 
 
 
-from src.routers.fetch_user import validate_password
-import pytest
+# from src.routers.fetch_user import validate_password
+# import pytest
 
 
 # @pytest.mark.parametrize("password, expected_valid, expected_result", [
@@ -37,16 +37,16 @@ import pytest
 #         validate_password(None)
 
 
-def test_valid_password_via_fixture(valid_password):
-    assert validate_password(valid_password) == (True, "ok")
+# def test_valid_password_via_fixture(valid_password):
+#     assert validate_password(valid_password) == (True, "ok")
 
-def test_invalid_passwords_via_fixture(invalid_passwords):
-    for pwd, expected_msg in invalid_passwords:
-        assert validate_password(pwd) == (False, expected_msg)
+# def test_invalid_passwords_via_fixture(invalid_passwords):
+#     for pwd, expected_msg in invalid_passwords:
+#         assert validate_password(pwd) == (False, expected_msg)
 
 
-def test_a(module_marker):
-    assert module_marker == "marker"
+# def test_a(module_marker):
+#     assert module_marker == "marker"
 
-def test_b(module_marker):
-    assert module_marker == "marker"
+# def test_b(module_marker):
+#     assert module_marker == "marker"

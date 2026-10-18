@@ -24,14 +24,14 @@
 #     data = resp.json()
 #     return data["address"]["city"]
 
-import re
+# import re
 
-def validate_password(password: str) -> tuple[bool, str]:
-    if len(password) < 8:
-        return False, "too short"
-    if not re.search(r"[A-Z]", password):
-        return False, "no uppercase"
-    if not re.search(r"\d", password):
-        return False, "no digit"
-    return True, "ok"
+# def validate_password(password: str) -> tuple[bool, str]:
+#     if len(password) < 8:
+#         return False, "too short"
+#     if not re.search(r"[A-Z]", password):
+#         return False, "no uppercase"
+#     if not re.search(r"\d", password):
+#         return False, "no digit"
+#     return True, "ok"
 
