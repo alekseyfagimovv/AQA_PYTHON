@@ -1,0 +1,18 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/api/users/2"
+method: DELETE
+body:
+  type: json
+  content: '{"name": "morpheus", "job": "leader"}'
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 204", function () {
+          pm.response.to.have.status(204);
+      });
+      pm.test("Content-Type is present  Date", function () {
+          pm.response.to.have.header("Date");
+      });
+    language: text/javascript
+order: 2000

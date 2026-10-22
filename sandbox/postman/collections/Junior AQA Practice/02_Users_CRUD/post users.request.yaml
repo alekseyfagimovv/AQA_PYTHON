@@ -1,0 +1,22 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/api/users"
+method: POST
+body:
+  type: json
+  content: '{"name": "morpheus", "job": "leader"}'
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 201", function () {
+          pm.response.to.have.status(201);
+          const responseJson = pm.response.json();
+          pm.environment.set("user_id", responseJson.id);
+      });
+
+      pm.test("Response has 'id' property", function () {
+          const responseJson = pm.response.json();
+          pm.expect(responseJson).to.have.property("id");
+      });
+    language: text/javascript
+order: 1000

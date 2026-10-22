@@ -1,0 +1,11 @@
+name: reqres_env
+values:
+  - key: baseUrl
+    value: ''
+  - key: user_id
+    value: ''
+  - key: token
+    value: ''
+  - key: auth_token
+    value: ''
+color: 0
