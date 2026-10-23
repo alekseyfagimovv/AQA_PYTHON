@@ -1,0 +1,31 @@
+services:
+  booking_db:
+    image: postgres:16-alpine
+    container_name: booking_postgres
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - booking_data:/var/lib/postgresql/data
+    restart: always
+
+  booking_app:
+    build: .                           
+    container_name: booking_backend
+    ports:
+      - "8000:8000"                     
+    env_file:
+      - .env
+    depends_on:
+      - booking_db
+    volumes:
+      - ./migrations:/app/migrations
+    restart: always
+
+volumes:
+  booking_data:
+
+
+
+ 
