@@ -124,3 +124,9 @@ CASE
 END AS price
 FROM Rooms"""
 
+"""SELECT Countries.name as country_name
+FROM Cities
+INNER JOIN Regions ON Cities.regionid = Regions.id
+INNER JOIN Countries ON Regions.countryid = Countries.id
+WHERE Cities.name = "Salzburg";
+"""
