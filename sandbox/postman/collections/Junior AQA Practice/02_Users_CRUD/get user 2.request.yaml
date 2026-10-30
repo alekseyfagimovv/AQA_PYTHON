@@ -1,9 +1,0 @@
-$kind: http-request
-description: ""
-url: "{{baseUrl}}/api/users/2"
-method: GET
-headers:
-  - key: Authorization
-    value: Bearer {{auth_token}}
-    disabled: true
-order: 5000
